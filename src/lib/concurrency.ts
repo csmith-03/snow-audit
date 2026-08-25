@@ -7,7 +7,10 @@
 export async function mapWithConcurrency<T, R>(
   items: T[],
   limit: number,
-  fn: (item: T, index: number) => Promise<R>
+  fn: (item: T, index: number) => Promise<R>,
+  // Fires as each item settles (in completion order, not input order) — lets
+  // a caller report "n of m done" progress without waiting for the whole batch.
+  onSettle?: (result: R, item: T, index: number) => void
 ): Promise<R[]> {
   const results: R[] = new Array(items.length);
   let next = 0;
@@ -16,7 +19,9 @@ export async function mapWithConcurrency<T, R>(
     while (true) {
       const i = next++;
       if (i >= items.length) return;
-      results[i] = await fn(items[i], i);
+      const result = await fn(items[i], i);
+      results[i] = result;
+      onSettle?.(result, items[i], i);
     }
   }
 
