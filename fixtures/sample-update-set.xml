@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-08-25">
+  <sys_update_xml action="INSERT_OR_UPDATE">
+    <action>INSERT_OR_UPDATE</action>
+    <name>sys_script_include_abc123</name>
+    <payload>&lt;record_update table="sys_script_include"&gt;&lt;sys_script_include action="INSERT_OR_UPDATE"&gt;&lt;api_name&gt;x_thrive.UnsafeAjaxHelper&lt;/api_name&gt;&lt;name&gt;UnsafeAjaxHelper&lt;/name&gt;&lt;client_callable&gt;true&lt;/client_callable&gt;&lt;active&gt;true&lt;/active&gt;&lt;script&gt;&lt;![CDATA[var UnsafeAjaxHelper = Class.create();
+UnsafeAjaxHelper.prototype = Object.extendsObject(AbstractAjaxProcessor, {
+    getRecord: function() {
+        var table = this.getParameter('sysparm_table');
+        var query = this.getParameter('sysparm_query');
+        var gr = new GlideRecord(table);
+        gr.addEncodedQuery(query);
+        gr.query();
+        var apiKey = "sk_live_ABCDEF1234567890";
+        while (gr.next()) {
+            var inner = new GlideRecord('sys_user');
+            inner.get(gr.getValue('caller_id'));
+        }
+        gr.deleteMultiple();
+        return apiKey;
+    },
+    type: 'UnsafeAjaxHelper'
+});]]&gt;&lt;/script&gt;&lt;sys_id&gt;abc123&lt;/sys_id&gt;&lt;/sys_script_include&gt;&lt;/record_update&gt;</payload>
+    <source_table>sys_script_include</source_table>
+    <target_name>UnsafeAjaxHelper</target_name>
+    <type>Script Include</type>
+    <sys_id>upd1</sys_id>
+  </sys_update_xml>
+  <sys_update_xml action="INSERT_OR_UPDATE">
+    <action>INSERT_OR_UPDATE</action>
+    <name>sys_script_def456</name>
+    <payload>&lt;record_update table="sys_script"&gt;&lt;sys_script action="INSERT_OR_UPDATE"&gt;&lt;name&gt;Notify on Insert&lt;/name&gt;&lt;collection&gt;incident&lt;/collection&gt;&lt;when&gt;after&lt;/when&gt;&lt;condition&gt;&lt;/condition&gt;&lt;active&gt;true&lt;/active&gt;&lt;script&gt;&lt;![CDATA[(function executeRule(current, previous) {
+    async function notify() {
+        var res = await fetch('https://example.com');
+    }
+    setTimeout(notify, 1000);
+    current.setWorkflow(false);
+    current.update();
+})(current, previous);]]&gt;&lt;/script&gt;&lt;sys_id&gt;def456&lt;/sys_id&gt;&lt;/sys_script&gt;&lt;/record_update&gt;</payload>
+    <source_table>sys_script</source_table>
+    <target_name>Notify on Insert</target_name>
+    <type>Business Rule</type>
+    <sys_id>upd2</sys_id>
+  </sys_update_xml>
+  <sys_update_xml action="INSERT_OR_UPDATE">
+    <action>INSERT_OR_UPDATE</action>
+    <name>sys_dictionary_ghi789</name>
+    <payload>&lt;record_update table="sys_dictionary"&gt;&lt;sys_dictionary action="INSERT_OR_UPDATE"&gt;&lt;sys_id&gt;ghi789&lt;/sys_id&gt;&lt;/sys_dictionary&gt;&lt;/record_update&gt;</payload>
+    <source_table>sys_dictionary</source_table>
+    <target_name>incident.u_field</target_name>
+    <type>Dictionary Entry</type>
+    <sys_id>upd3</sys_id>
+  </sys_update_xml>
+</unload>

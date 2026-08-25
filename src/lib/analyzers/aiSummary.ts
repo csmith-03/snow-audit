@@ -158,6 +158,12 @@ export async function analyzeScriptWithAi(script: Script): Promise<AiAnalysis> {
     if (err instanceof Anthropic.RateLimitError) {
       return fallback(script, "rate limited — try again shortly");
     }
+    if (
+      err instanceof Anthropic.BadRequestError &&
+      /credit balance is too low/i.test(err.message)
+    ) {
+      return fallback(script, "Anthropic account has insufficient credits");
+    }
     if (err instanceof Anthropic.APIError) {
       return fallback(script, `API error ${err.status}`);
     }
