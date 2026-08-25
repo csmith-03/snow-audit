@@ -14,6 +14,11 @@ export default function UploadPage() {
     skipped: { name: string; table: string | null }[];
     errors: string[];
   } | null>(null);
+  const [progress, setProgress] = useState<{
+    completed: number;
+    total: number;
+    scriptName: string | null;
+  } | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -24,6 +29,7 @@ export default function UploadPage() {
     setStatus("working");
     setError(null);
     setDetails(null);
+    setProgress(null);
 
     const form = new FormData();
     form.append("file", file);
@@ -31,21 +37,64 @@ export default function UploadPage() {
 
     try {
       const res = await fetch("/api/analyze", { method: "POST", body: form });
-      const data = await res.json();
 
+      // Parse failures (bad/empty XML) return a normal JSON error before any
+      // streaming starts — same shape as before.
       if (!res.ok) {
+        const data = await res.json();
         setError(data.error ?? "Something went wrong parsing that file.");
         setDetails(data.details ?? null);
         setStatus("error");
         return;
       }
 
-      const report: Report = data.report;
-      // No backend/DB yet in this build — the report lives in this browser
-      // session only. Swap for a real persisted report + redirect once the
-      // API route writes to a database.
-      sessionStorage.setItem(`report:${report.id}`, JSON.stringify(report));
-      router.push(`/report/${report.id}`);
+      if (!res.body) {
+        setError("No response body from the server. Try again.");
+        setStatus("error");
+        return;
+      }
+
+      // Success streams newline-delimited JSON progress events, ending in a
+      // "done" event carrying the full report — see api/analyze/route.ts.
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? ""; // last line may be incomplete — hold it for the next chunk
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const event = JSON.parse(line);
+
+          if (event.type === "parsed") {
+            setProgress({ completed: 0, total: event.total, scriptName: null });
+          } else if (event.type === "progress") {
+            setProgress({
+              completed: event.completed,
+              total: event.total,
+              scriptName: event.scriptName,
+            });
+          } else if (event.type === "done") {
+            const report: Report = event.report;
+            // No backend/DB yet in this build — the report lives in this
+            // browser session only. Swap for a real persisted report +
+            // redirect once the API route writes to a database.
+            sessionStorage.setItem(`report:${report.id}`, JSON.stringify(report));
+            router.push(`/report/${report.id}`);
+            return;
+          } else if (event.type === "error") {
+            setError(event.error ?? "Analysis failed.");
+            setStatus("error");
+            return;
+          }
+        }
+      }
     } catch {
       setError("Couldn't reach the server. Try again.");
       setStatus("error");
@@ -122,12 +171,36 @@ export default function UploadPage() {
           </div>
         )}
 
+        {status === "working" && progress && (
+          <div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-800">
+              <div
+                className="h-full rounded-full bg-neutral-900 transition-all duration-300 dark:bg-white"
+                style={{
+                  width:
+                    progress.total > 0
+                      ? `${Math.round((progress.completed / progress.total) * 100)}%`
+                      : "0%",
+                }}
+              />
+            </div>
+            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+              {progress.completed} of {progress.total} scripts analyzed
+              {progress.scriptName ? ` — ${progress.scriptName}` : ""}
+            </p>
+          </div>
+        )}
+
         <button
           type="submit"
           disabled={status === "working"}
           className="rounded-lg bg-neutral-900 px-5 py-3 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-50 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
         >
-          {status === "working" ? "Analyzing…" : "Analyze"}
+          {status === "working"
+            ? progress
+              ? `Analyzing… (${progress.completed}/${progress.total})`
+              : "Starting…"
+            : "Analyze"}
         </button>
       </form>
     </div>
