@@ -10,13 +10,11 @@ export default function Home() {
     <div className="mx-auto max-w-5xl px-6 py-16">
       <section className="max-w-2xl">
         <h1 className="text-4xl font-bold tracking-tight">
-          Know what your ServiceNow scripts actually do before you touch them.
+          Audit your ServiceNow update sets before you release them.
         </h1>
         <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
           Upload an Update Set export and get a plain-English summary and a
-          security/quality review of every Business Rule, Client Script,
-          Script Include, and UI Action in it — in minutes, not a
-          consultant&apos;s multi-week engagement.
+          security/quality review of it.
         </p>
         <div className="mt-8 flex gap-4">
           <Link

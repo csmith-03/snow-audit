@@ -57,8 +57,7 @@ export default function UploadPage() {
       <h1 className="text-2xl font-bold">Run an audit</h1>
       <p className="mt-2 text-neutral-600 dark:text-neutral-400">
         Export your Update Set as XML (Retrieved Update Sets → the update set
-        record → Export to XML) and upload it here. Nothing is sent to
-        ServiceNow — this only reads the file you provide.
+        record → Export to XML) and upload it here.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-6">

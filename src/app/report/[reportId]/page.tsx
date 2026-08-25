@@ -9,6 +9,7 @@ import { CHECKLIST_BY_ID } from "@/lib/checklist";
 import { DEFAULT_CONFIDENCE_FLOOR } from "@/lib/riskScore";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { RiskBadge } from "@/components/RiskBadge";
+import { downloadCsv, findingsToCsv } from "@/lib/csvExport";
 
 // No subscription source — sessionStorage doesn't change out from under us
 // for a given reportId — so this only exists to read a browser-only API
@@ -107,7 +108,32 @@ export default function ReportPage() {
             {new Date(report.createdAt).toLocaleString()}
           </p>
         </div>
-        <RiskBadge score={report.riskScore ?? 0} />
+        <div className="flex items-center gap-3">
+          <RiskBadge score={report.riskScore ?? 0} />
+          <button
+            onClick={() => {
+              const stamp = report.createdAt.slice(0, 10);
+              const safeName = report.instanceName
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "");
+              // Export matches what's currently on screen — same confidence
+              // filter as the "show all" toggle above.
+              const findings = showAll
+                ? report.findings
+                : report.findings.filter(
+                    (f) => f.aiConfidence >= DEFAULT_CONFIDENCE_FLOOR
+                  );
+              downloadCsv(
+                `snow-audit-${safeName || "report"}-${stamp}.csv`,
+                findingsToCsv({ ...report, findings })
+              );
+            }}
+            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-900"
+          >
+            Export CSV
+          </button>
+        </div>
       </div>
 
       <label className="mt-8 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">

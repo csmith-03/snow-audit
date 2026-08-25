@@ -40,8 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </header>
         <main className="flex-1">{children}</main>
         <footer className="border-t border-neutral-200 px-6 py-6 text-center text-xs text-neutral-500 dark:border-neutral-800">
-          snow-audit — code review for ServiceNow customizations. Nothing you
-          upload leaves your browser session in this build.
+          snow-audit — code review for ServiceNow developers
         </footer>
       </body>
     </html>
