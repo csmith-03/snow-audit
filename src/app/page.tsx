@@ -15,7 +15,10 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center px-6 py-16">
+    <div
+      className="flex flex-1 items-center justify-center bg-neutral-950 bg-cover bg-center bg-no-repeat px-6 py-16"
+      style={{ backgroundImage: "url(/kinde-background.png)" }}
+    >
       <div className="w-full max-w-sm rounded-xl border border-neutral-200 bg-white p-8 text-center shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
         <p className="flex items-center justify-center gap-2 font-mono text-sm font-semibold tracking-tight">
           <Logo className="h-6 w-6" />
