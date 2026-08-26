@@ -25,7 +25,8 @@
     <a href="https://github.com/csmith-03/snow-audit/issues/new?labels=enhancement">Request Feature</a>
   </p>
 
-  <img width="1281" height="881" alt="image" src="https://github.com/user-attachments/assets/3d628f69-014e-48f7-890b-41631dec6baf" />
+  <img width="1880" height="819" alt="image" src="https://github.com/user-attachments/assets/b38a59f0-335f-45a3-860a-6823511854b1" />
+
 
 </div>
 
