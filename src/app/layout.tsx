@@ -7,6 +7,7 @@ import {
   LogoutLink,
   RegisterLink,
 } from "@kinde-oss/kinde-auth-nextjs/server";
+import { Logo } from "@/components/Logo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,7 +39,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
         <header className="border-b border-neutral-200 dark:border-neutral-800">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-            <Link href="/" className="font-mono text-sm font-semibold tracking-tight">
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-mono text-sm font-semibold tracking-tight"
+            >
+              <Logo className="h-5 w-5" />
               snow-audit
             </Link>
             <nav className="flex items-center gap-6 text-sm">
@@ -66,7 +71,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </header>
         <main className="flex flex-1 flex-col">{children}</main>
         <footer className="border-t border-neutral-200 px-6 py-6 text-center text-xs text-neutral-500 dark:border-neutral-800">
-          snow-audit — code review for ServiceNow developers
+          &copy; {new Date().getFullYear()} snow-audit. All rights reserved.
         </footer>
       </body>
     </html>
